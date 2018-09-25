@@ -1,4 +1,7 @@
 # BOTP
+
+Author Enrique Santos
+
 One time password over ethereum blockchain
 
 Advantages and disadvantages of BOTP
