@@ -1,0 +1,6 @@
+.m-bottom-40 {
+    margin-bottom: 40px;
+}
+.line-break {
+    white-space: pre-wrap;word-wrap: break-word;overflow-wrap: break-word;line-height: 2;
+}

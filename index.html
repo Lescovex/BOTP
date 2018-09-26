@@ -1,83 +1,137 @@
 <html>
-    <head>
-        <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" >
-        <script type="text/javascript" src="lib/jquery-3.1.1.min.js" ></script>
-        <script type="text/javascript" src="lib/sha3.js" ></script>
-        <script type="text/javascript" src="botp.js" ></script>
-    </head>
-    
-    <body><div class="container-fluid">
-        <div class="row"><div class="span8">
-            <h1>Blockchain-based One-time Password (BOTP)</h1>
-            
+<head>
+    <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="css/jumbotron.css">
+    <link type="text/css" rel="stylesheet" href="css/custom.css">
+    <script type="text/javascript" src="lib/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="lib/sha3.js"></script>
+    <script type="text/javascript" src="botp.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+
+                <a class="navbar-brand" href="#"><img src="image/logo.png" alt=""></a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+        <div class="container text-justify">
+            <h2>Blockchain-based One-time Password (BOTP)</h2>
             <h3>An example demo of an authenticator algorithm based in blockchain</h3>
-            
-            <p>Fork of the code at <a href="http://blog.tinisles.com/2011/10/google-authenticator-one-time-password-algorithm-in-javascript">http://blog.tinisles.com/2011/10/google-authenticator-one-time-password-algorithm-in-javascript</a></p>
 
-            <p>This page contains a javascript implementation of the new <em>Blockchain-based One-time Password Algorithm, BOTP</em>, inspired on the TOTP used by Google Authenticator and described in the <a href="http://tools.ietf.org/id/draft-mraihi-totp-timebased-06.html">TOTP RFC Draft</a>.</p>
+            <p>Fork of the code at <a
+                    href="http://blog.tinisles.com/2011/10/google-authenticator-one-time-password-algorithm-in-javascript">http://blog.tinisles.com/2011/10/google-authenticator-one-time-password-algorithm-in-javascript</a>
+            </p>
 
-            <p>The BOTP is in development. When a PAM module will be available for installation and configuration on servers, you would use a client app similar to this demo to create one-time passwords for your own application.  You would add an account plus secret by scanning a QR code (more info on the <a href="http://code.google.com/p/google-authenticator/wiki/KeyUriFormat">google code wiki</a>).  The javascript below implements the algorithm the smartphone app would to generate the OTP - you would use this same algorithm <em>server-side</em> to verify an OTP.</p>
-        </div></div>
+            <p>This page contains a javascript implementation of the new <em>Blockchain-based One-time Password
+                Algorithm, BOTP</em>, inspired on the TOTP used by Google Authenticator and described in the <a
+                    href="http://tools.ietf.org/id/draft-mraihi-totp-timebased-06.html">TOTP RFC Draft</a>.</p>
 
-        <div class="row"><form>
-            <fieldset style="display:inline-block;vertical-align:top;padding:10;">            
+            <p>The BOTP is in development. When a PAM module will be available for installation and configuration on
+                servers, you would use a client app similar to this demo to create one-time passwords for your own
+                application. You would add an account plus secret by scanning a QR code (more info on the <a
+                        href="http://code.google.com/p/google-authenticator/wiki/KeyUriFormat">google code wiki</a>).
+                The javascript below implements the algorithm the smartphone app would to generate the OTP - you would
+                use this same algorithm <em>server-side</em> to verify an OTP.</p>
+        </div>
+    </div>
 
-                <div class="clearfix"><label for="userAtServer">user@server to authenticate</label><div class="input">
-                    <input id='userAtServer' class="xlarge" type="email" size="30" name="user" value="user@host.com" />
-                </div></div>
+    <div class="container">
+        <!-- Example row of columns -->
+        <div class="row">
+            <div class="col-md-4 m-bottom-40">
+                <fieldset>
+                    <div class="clearfix">
+                        <label for="userAtServer">user@server to authenticate</label>
+                        <div class="input">
+                            <input id='userAtServer' class="xlarge form-control" type="email" size="30" name="user"
+                                   value="user@host.com"/>
+                        </div>
+                    </div>
+                    <div class="clearfix"><label for="secret">Secret (base32)</label>
+                        <div class="input">
+                            <input id='secret' class="xlarge form-control" type="text" size="30" name="secret" value="JBSWY3DPEHPK3PXP"/>
+                        </div>
+                    </div>
+                    <div class="clearfix"><label>Secret (hex)</label>
+                        <div>
+                            <span class="label label-default" id='secretHex'></span>
+                            <span id='secretHexLength'></span>
+                        </div>
+                    </div>
+                    <div class="clearfix">
+                        <label for="blockchain">Blockchain network (block time)</label>
+                        <div class="input">
+                            <select id='blockchain' class="xlarge form-control" type="text" name="blockchain">
+                                <option value="eth">ETH: Ethereum (15s)</option>
+                                <option value="btc">BTC: Bitcoin (10m)</option>
+                                <option value="ltc">LTC: Litecoin (2.5m)</option>
+                                <option value="dash">DASH: Dash (3.5m)</option>
+                                <option value="doge">DOGE: Dogecoin (1m)</option>
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-md-4 text-center m-bottom-40">
+                <fieldset>
+                    <div class="clearfix"><label>Configuration QR Code</label>
+                        <div>
+                            <img id='qrImg'/>
+                        </div>
+                        <div style="margin-top: 10px">
+                            <span class="label label-primary" id='configURI'></span>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-md-4 m-bottom-40">
+                <fieldset>
 
-                <div class="clearfix"><label for="secret">Secret (base32)</label><div class="input">
-                    <input id='secret' class="xlarge" type="text" size="30" name="secret" value="JBSWY3DPEHPK3PXP" />
-                </div></div>
+                    <div class="clearfix"><label for="update">Click button to update results</label>
+                        <div class="input">
+                            <button id='update' class="xlarge btn btn-success" type="button" name="update">Compute results</button>
+                        </div>
+                    </div>
 
-                <div class="clearfix"><label>Secret (hex)</label><div>
-                    <span class="label label-default" id='secretHex'></span>
-                    <span id='secretHexLength'></span>
-                </div></div>
+                    <div class="clearfix"><label>Block count</label>
+                        <div>
+                            <span class="label label-default" id='blockcount'>0</span>
+                        </div>
+                    </div>
 
-                <div class="clearfix"><label for="blockchain">Blockchain network (block time)</label><div class="input">
-                    <select id='blockchain' class="xlarge" type="text" name="blockchain">
-                        <option value="eth">ETH: Ethereum (15s)</option>
-                        <option value="btc">BTC: Bitcoin (10m)</option>
-                        <option value="ltc">LTC: Litecoin (2.5m)</option>
-                        <option value="dash">DASH: Dash (3.5m)</option>
-                        <option value="doge">DOGE: Dogecoin (1m)</option>
-                    </select>
-                </div></div>
+                    <div class="clearfix"><label>Block hash</label>
+                        <div>
+                            <span class="label label-default line-break" id='blockhash'>Blockhash not set. </span>
+                        </div>
+                    </div>
 
-            </fieldset>
-            <fieldset style="display:inline-block;vertical-align:top;padding:10;">
+                    <div class="clearfix"><label>HMAC(secret, time)</label>
+                        <div id='hmac'>
 
-                <div class="clearfix"><label>Configuration QR Code</label><div>
-                    <img id='qrImg' />
-                </div><div>
-                    <span class="label label-primary" id='configURI'></span>
-                </div></div>
+                        </div>
+                    </div>
 
-            </fieldset>
-            <fieldset style="display:inline-block;vertical-align:top;padding:10;">            
- 
-                <div class="clearfix"><label for="update">Click button to update results</label><div class="input">
-                    <button id='update' class="xlarge" type="button" name="update">Compute results</button>
-                </div></div>
+                    <div class="clearfix"><label>One-time Password</label>
+                        <div>
+                            <span class="label label-primary" id='otp'></span>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
 
-                <div class="clearfix"><label>Block count</label><div>
-                    <span class="label label-default" id='blockcount'>0</span>
-                </div></div>
+        <hr>
 
-                <div class="clearfix"><label>Block hash</label><div>
-                    <span class="label label-default" id='blockhash'>Blockhash not set. </span>
-                </div></div>
+        <footer>
+            <p>&copy; 2018 lescovex</p>
+        </footer>
+    </div> <!-- /container -->
 
-                <div class="clearfix"><label>HMAC(secret, time)</label><div id='hmac'>
-
-                </div></div>
-
-                <div class="clearfix"><label>One-time Password</label><div>
-                    <span class="label label-primary" id='otp'></span>
-                </div></div>
-
-            </fieldset>
-        </form></div>
-    </div></body>
+</body>
 </html>
