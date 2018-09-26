@@ -1,4 +1,20 @@
-/* BOTP (Blockchain authenticator demo) */
+/*  BOTP (Blockchain authenticator algorithm, for demo and test)
+        Author: Enrique Santos, september 2018
+
+Modified from Russ Sayers code on this link: 
+http://blog.tinisles.com/2011/10/google-authenticator-one-time-password-algorithm-in-javascript/
+
+SHA-3 is used, as it is the currrently recommended hash function, instead of 
+SHA-1 and SHA2. Library jsSHA is used for HMAC and SHA-3: 
+http://caligatio.github.com/jsSHA/ 
+
+HMAC is computed from the shared secret and the hash of the last block, which 
+is taken by the BlockCypher API. Ethereum network is used as primary option, but 
+other blockchains offered by that API are: Bitcoin, Litecoin, Dash and Dogecoin. 
+
+JQuery 3.1.1 is used to access and set web interface elements.
+
+*/
 
   
 $(function () {
@@ -12,16 +28,7 @@ $(function () {
         updateOtp();
     });
 
-    // setInterval(timer, 5000);
 });
-
-var timeStep = 10;
-
-function timer() {
-    var epoch = Math.round(new Date().getTime() / 1000.0);
-    var countDown = timeStep - (epoch % timeStep);
-    if (countDown == timeStep) updateOtp();    
-}
 
 function updateOtp() {
         
@@ -42,12 +49,10 @@ function updateOtp() {
         shaObj.setHMACKey(key, "HEX");
 
         var blockchain = $('#blockchain').val();
-        console.log(blockchain);
         
         $.get( "https://api.blockcypher.com/v1/" + blockchain + "/main", function( result ) {
             var latestBlock = JSON.parse(result);
             
-            console.log(latestBlock.hash);
             $('#blockhash').text('0x' + latestBlock.hash);
             shaObj.update(latestBlock.hash);
 
@@ -58,15 +63,19 @@ function updateOtp() {
             // offset is the value of the last hex digit (half byte) of hmac
             var offset = hex2dec(hmac.substring(hmac.length - 1));
             
-            var part1 = hmac.substr(0, offset * 2);
-            var part2 = hmac.substr(offset * 2, 8);
-            var part3 = hmac.substr(offset * 2 + 8, hmac.length - offset);
+            var part = hmac.substr(0, offset * 2);
+            labelAppend('label-default', part);
 
-            labelAppend('label-default', part1);
-            labelAppend('label-primary', part2);
-            labelAppend('label-default', part3);
+            var otp = hmac.substr(offset * 2, 8);
+            labelAppend('label-primary', otp);
 
-            $('#otp').text(hex2dec(part2) % 1000000);
+            // var part3 = hmac.substr(offset * 2 + 8, hmac.length - offset);
+            part = hmac.substr(offset * 3 + 8 - hmac.length);
+            labelAppend('label-default', part);
+
+            var otp = '' + ( hex2dec(otp) % 1000000 );
+            while (otp.length < 6) { otp = '0' + otp; } // left padding with '0'
+            $('#otp').text( otp );
             
         }, "text");
     }
